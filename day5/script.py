@@ -95,8 +95,8 @@ def part2():
         while i < len(mapped_ranges) - 1:
             left, right = mapped_ranges[i], mapped_ranges[i + 1]
 
-            if left[0] >= right[0]:
-                mapped_ranges[i] = (left[0], max(sum(left), right[0]))
+            if sum(left) >= right[0]:
+                mapped_ranges[i] = (left[0], max(sum(left), sum(right)) - left[0])
                 del mapped_ranges[i + 1]
                 continue
             i += 1
@@ -127,4 +127,3 @@ def part2():
     location_starts = [list(map(lambda x: x[0], location_range)) for location_range in location_ranges]
 
     print(min(map(min, location_starts)))
-
