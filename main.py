@@ -3,3 +3,4 @@ import day2.script
 import day3.script
 import day4.script
 import day5.script
+import day6.script
