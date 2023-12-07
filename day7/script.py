@@ -10,7 +10,7 @@ def map_label_to_value(label: str) -> int:
         'A': 14,
         'K': 13,
         'Q': 12,
-        'J': 11 if Bet.strength_method is not Bet.hand_strength_jokers else 1,
+        'J': 11 if Bet.strength_method is not Bet.hand_strength_jeepers else 1,
         'T': 10,
     }.get(label, None) or int(label)
 
@@ -35,9 +35,9 @@ class Bet:
             return 3 if occurrences[1][1] == 2 else 2
         return 1
 
-    def hand_strength_jokers(self) -> int:
+    def hand_strength_jeepers(self) -> int:
         occurrences = self.occurrences()
-        jokers = self.cards.count('J')
+        jeepers = self.cards.count('J')
 
         if occurrences[0][0] == 'J':
             _, *occurrences = occurrences
@@ -45,11 +45,11 @@ class Bet:
                 return 7
 
         strength = 1
-        if occurrences[0][1] + jokers >= 4:
-            strength = 2 + occurrences[0][1] + jokers
-        elif occurrences[0][1] + jokers == 3:
+        if occurrences[0][1] + jeepers >= 4:
+            strength = 2 + occurrences[0][1] + jeepers
+        elif occurrences[0][1] + jeepers == 3:
             strength = 5 if occurrences[1][1] == 2 else 4
-        elif occurrences[0][1] + jokers == 2:
+        elif occurrences[0][1] + jeepers == 2:
             strength = 3 if occurrences[1][1] == 2 else 2
         return max(strength, self.hand_strength())
 
@@ -89,7 +89,7 @@ for i, bet in enumerate(sorted_bets, start=1):
 print(total_winnings)
 
 # Part 2
-Bet.strength_method = Bet.hand_strength_jokers
+Bet.strength_method = Bet.hand_strength_jeepers
 
 sorted_bets = sorted(bets)
 total_winnings = 0
