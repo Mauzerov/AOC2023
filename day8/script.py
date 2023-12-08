@@ -18,7 +18,6 @@ moves = 0
 
 while current != "ZZZ":
     move = dirs[moves % len(dirs)]
-    # print(move, current, mapping[current], moves)
     current = mapping[current][move == "R"]
     moves += 1
 
@@ -33,7 +32,6 @@ while any(map(lambda x: x[-1] != "Z", nodes)):
         if node[-1] == "Z":
             continue
         move = dirs[moves[i] % len(dirs)]
-        # print(move, node, mapping[node], moves)
         nodes[i] = mapping[node][move == "R"]
         moves[i] += 1
 print(lcm(*moves))
