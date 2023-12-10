@@ -49,4 +49,3 @@ with open("day1/input.txt", "r") as f:
         lines[index] = number + last_digit
 
     print(sum(map(int, lines)))
-

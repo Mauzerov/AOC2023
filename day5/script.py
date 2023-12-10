@@ -127,3 +127,4 @@ def part2():
     location_starts = [list(map(lambda x: x[0], location_range)) for location_range in location_ranges]
 
     print(min(map(min, location_starts)))
+

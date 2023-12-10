@@ -32,4 +32,3 @@ for numbers in lines:
 print(extrapolated_sum)
 print(extrapolated_backwards_sum)
 
-

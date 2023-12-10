@@ -47,4 +47,3 @@ print(
 
 print(number_of_winning_ways(*one_race))
 
-

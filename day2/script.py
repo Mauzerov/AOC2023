@@ -43,4 +43,3 @@ with open("day2/input.txt", "r") as f:
             id_sum += game_id
     print(id_sum)
     print(power_sum)
-

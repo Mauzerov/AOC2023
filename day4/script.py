@@ -30,5 +30,5 @@ for index, line in enumerate(lines):
         
 
 print(total)
-
 print(sum(card_copies.values()))
+

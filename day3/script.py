@@ -62,3 +62,4 @@ with open("day3/input.txt", "r") as f:
     double_gears = filter(lambda g: len(gears[g]) > 1, gears)
 
     print(sum(map(lambda g: functools.reduce(int.__mul__, gears[g]), double_gears)))
+

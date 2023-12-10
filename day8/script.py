@@ -22,7 +22,6 @@ while current != "ZZZ":
     moves += 1
 
 print(moves)
-
 # Part 2
 nodes = list(filter(lambda x: x[-1] == "A", mapping.keys()))
 moves = [0] * len(nodes)
