@@ -10,20 +10,22 @@ if __name__ == '__main__':
         for line in lines:
             time = timeit(line, number=1)
             day_label = "Day #" + re.findall(r'\d+', line)[0]
-            times.append((day_label, time))
-            print(f"Time taken: {time:.4f} seconds for: {day_label!r}")
+            times.append((time, day_label))
+            print(f"Time taken: {{:.5f}} seconds for: {{!r}}".format(*times[-1]))
 
     # Analyze results
     print("\nAnalyzing results...")
-    slowest = max(times, key=lambda x: x[1])
-    fastest = min(times, key=lambda x: x[1])
-    print(f"Slowest day took: {slowest[1]:.4f} seconds for: {slowest[0]!r}")
-    print(f"Fastest day took: {fastest[1]:.4f} seconds for: {fastest[0]!r}")
+    slowest = max(times, key=lambda x: x[0])
+    fastest = min(times, key=lambda x: x[0])
+    print(f"Slowest day took: {{:.5f}} seconds for: {{!r}}".format(*slowest))
+    print(f"Fastest day took: {{:.5f}} seconds for: {{!r}}".format(*fastest))
     # Plot results
     fig = tpl.figure()
     fig.barh(
-        labels=list(map(lambda x: x[0], times)),
-        vals=list(map(lambda x: round(x[1], 5), times)),
-        val_format="{:.5f}s",
+        *zip(*times),
+        val_format=f"{{:.5f}}s",
     )
     fig.show()
+    sum_times = sum(map(lambda x: x[0], times))
+    print(f"Total   time: {{:.5f}} seconds".format(sum_times))
+    print(f"Average time: {{:.5f}} seconds".format(sum_times / len(times)))
