@@ -9,8 +9,9 @@ if __name__ == '__main__':
         times = []
         for line in lines:
             time = timeit(line, number=1)
-            times.append((line, time))
-            print(f"Time taken: {time:.4f} seconds for: {line!r}")
+            day_label = "Day #" + re.findall(r'\d+', line)[0]
+            times.append((day_label, time))
+            print(f"Time taken: {time:.4f} seconds for: {day_label!r}")
 
     # Analyze results
     print("\nAnalyzing results...")
@@ -21,7 +22,8 @@ if __name__ == '__main__':
     # Plot results
     fig = tpl.figure()
     fig.barh(
-        list(map(lambda x: round(x[1], 5), times)),
-        list(map(lambda x: 'Day: #' + re.findall(r'\d+', x[0])[0], times))
+        labels=list(map(lambda x: x[0], times)),
+        vals=list(map(lambda x: round(x[1], 5), times)),
+        val_format="{:.5f}s",
     )
     fig.show()
