@@ -1,6 +1,7 @@
 from pprint import pprint
 from typing import TypeAlias
 from operator import add
+from collections import deque
 
 print(__file__)
 
@@ -93,8 +94,8 @@ for line in filtered_pipe_map:
     expanded_gaps.append(next_line + line[-1])
 
 # traverse the expanded grid and fill in all the gaps connected to the outside
-to_see = set()
-to_see.add((0, 0))  # start in the top left corner (assuming the main pipe doesn't go through the corner)
+to_see = deque()
+to_see.append((0, 0))  # start in the top left corner (assuming the main pipe doesn't go through the corner)
 
 while to_see:  # while there are still gaps to see
     x, y = to_see.pop()
@@ -108,7 +109,7 @@ while to_see:  # while there are still gaps to see
             # if the gap is connected to the outside, fill it in and add it to the list of gaps to see
             if expanded_gaps[y + j][x + i] in '.':
                 expanded_gaps[y + j] = expanded_gaps[y + j][:x + i] + "O" + expanded_gaps[y + j][x + i + 1:]
-                to_see.add((x + i, y + j))
+                to_see.append((x + i, y + j))
 
 # count the number of 2x2 squares of dots
 # since we expanded the gaps, we need to check 2x2 squares
