@@ -8,3 +8,4 @@ import day7.script
 import day8.script
 import day9.script
 import day10.script
+import day11.script
