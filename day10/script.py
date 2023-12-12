@@ -90,32 +90,41 @@ for line in filtered_pipe_map:
             next_line += "|."
         elif line[i] in 'LJ-.':
             next_line += ".."
-    expanded_gaps.append(new_line + line[-1])
-    expanded_gaps.append(next_line + line[-1])
+    expanded_gaps.append(list(new_line + line[-1]))
+    expanded_gaps.append(list(next_line + line[-1]))
+
+
+# find the bounds of the expanded grid
+# we need to add/subtract 1 to allow traversing going around the edges
+left = min(x * 2 for x, _ in pipe_locations) - 1
+right = max(x * 2 for x, _ in pipe_locations) + 1
+top = min(y * 2 for _, y in pipe_locations) - 1
+bottom = max(y * 2 for _, y in pipe_locations) + 1
 
 # traverse the expanded grid and fill in all the gaps connected to the outside
 to_see = deque()
-to_see.append((0, 0))  # start in the top left corner (assuming the main pipe doesn't go through the corner)
+to_see.append((left, top))  # start in the top left corner where pipes can't be
 
 while to_see:  # while there are still gaps to see
     x, y = to_see.pop()
     # traverse all 8 directions around the gap
     for i in range(-1, 2):
         for j in range(-1, 2):
-            if x + i < 0 or x + i >= len(expanded_gaps[0]):
+            if x + i < left or x + i > right:
                 continue
-            if y + j < 0 or y + j >= len(expanded_gaps):
+            if y + j < top or y + j > bottom:
                 continue
             # if the gap is connected to the outside, fill it in and add it to the list of gaps to see
-            if expanded_gaps[y + j][x + i] in '.':
-                expanded_gaps[y + j] = expanded_gaps[y + j][:x + i] + "O" + expanded_gaps[y + j][x + i + 1:]
+            if expanded_gaps[y + j][x + i] == '.':
+                expanded_gaps[y + j][x + i] = "O"
                 to_see.append((x + i, y + j))
 
 # count the number of 2x2 squares of dots
 # since we expanded the gaps, we need to check 2x2 squares
 dots = 0
-for y in range(0, len(expanded_gaps) - 1, 2):
-    for x in range(0, len(expanded_gaps[0]) - 1, 2):
-        if expanded_gaps[y][x:x + 2] + expanded_gaps[y + 1][x:x + 2] == "....":
+for x in range(left, right - 1, 2):
+    for y in range(top, bottom - 1, 2):
+        if all(c == '.' for c in expanded_gaps[y][x:x + 2] + expanded_gaps[y + 1][x:x + 2]):
             dots += 1
+
 print(dots)  # PART 2
