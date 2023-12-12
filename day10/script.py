@@ -108,8 +108,8 @@ to_see.append((left, top))  # start in the top left corner where pipes can't be
 while to_see:  # while there are still gaps to see
     x, y = to_see.pop()
     # traverse all 8 directions around the gap
-    for i in range(-1, 2):
-        for j in range(-1, 2):
+    for i in (-1, 1):
+        for j in (-1, 1):
             if x + i < left or x + i > right:
                 continue
             if y + j < top or y + j > bottom:
