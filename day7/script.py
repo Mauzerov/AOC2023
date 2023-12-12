@@ -71,13 +71,8 @@ class Bet:
 
 with open('day7/input.txt') as f:
     lines = f.readlines()
+    bets = [Bet(cards, int(value)) for cards, value in map(str.split, lines)]
 
-    bets = list(
-        map(
-            lambda line: Bet(line.split(' ')[0], int(line.split(' ')[1])),
-            lines
-        )
-    )
 
 # Part 1
 sorted_bets = sorted(bets)
