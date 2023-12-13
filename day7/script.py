@@ -30,6 +30,7 @@ class Bet:
     def occurrences(self) -> list[tuple[str, int]]:
         return Counter(self.cards).most_common()
 
+    @functools.lru_cache(maxsize=None)
     def hand_strength(self) -> int:
         occurrences = self.occurrences()
         if occurrences[0][1] >= 4:
@@ -40,6 +41,7 @@ class Bet:
             return 3 if occurrences[1][1] == 2 else 2
         return 1
 
+    @functools.lru_cache(maxsize=None)
     def hand_strength_jeepers(self) -> int:
         occurrences = self.occurrences()
         jeepers = self.cards.count('J')
