@@ -1,4 +1,5 @@
 import dataclasses
+import functools
 import typing
 from collections import Counter
 
@@ -20,8 +21,12 @@ class Bet:
     cards: str
     value: int
 
+    def __hash__(self):
+        return hash(self.cards)
+
     strength_method: typing.Callable[[typing.Self, typing.Self], int] = None
 
+    @functools.lru_cache(maxsize=None)
     def occurrences(self) -> list[tuple[str, int]]:
         return Counter(self.cards).most_common()
 
