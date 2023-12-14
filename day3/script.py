@@ -34,16 +34,16 @@ def is_part_number(_grid: list[str], _x: int, _y: int, _width: int):
 with open("day3/input.txt", "r") as f:
     grid: list[str] = f.read().splitlines()
     gears: dict[Symbol, list[int]] = {}
-    width, height = len(grid[0]), len(grid)
+    size = len(grid)
     sum_part_numbers = 0
-    for y in range(height):
+    for y in range(size):
         x = 0
-        while x < width:
+        while x < size:
             if not grid[y][x].isdigit():
                 x += 1
                 continue
             width_of_part = 1
-            while grid[y][x:x + width_of_part].isdigit() and x + width_of_part <= width:
+            while grid[y][x:x + width_of_part].isdigit() and x + width_of_part <= size:
                 width_of_part += 1
             number = int(grid[y][x:x + width_of_part - 1])
             symbols = is_part_number(grid, x, y, width_of_part - 1)
