@@ -12,3 +12,4 @@ import day11.script
 import day12.script
 import day13.script
 import day14.script
+import day15.script
