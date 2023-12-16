@@ -60,32 +60,39 @@ def apply_gravity(_lines: tuple[str]) -> tuple[str]:
     )
 
 
+total = 0
+
+
 @functools.lru_cache(maxsize=None)
 def spin_cycle(_lines: tuple[str]) -> tuple[str]:
+    global total
     for _ in range(4):
-        _lines = apply_gravity(rotate(_lines))
+        start = perf_counter()
+        _lines = rotate(_lines)
+        total += perf_counter() - start
+        # print("Rotate", perf_counter() - start)
+        start = perf_counter()
+        _lines = apply_gravity(_lines)
+        total += perf_counter() - start
+        # print("Apply gravity", perf_counter() - start)
     return _lines
 
 
 cache: dict[tuple[str, ...], int] = dict()
+
+tortoise = spin_cycle(lines)
+hare = spin_cycle(spin_cycle(lines))
+prev = tortoise
+
 iterations = 0
-
-while True:
-    # key = ''.join(''.join(line) for line in lines)
-    if lines in cache:
-        first = cache[lines]
-        billionth = ((1_000_000_000 - first) % (iterations - first))
-
-        for key, value in cache.items():
-            if value == first + billionth:
-                load = 0
-                for i, line in enumerate(key):
-                    load += (size - i) * line.count('O')
-                print(load)  # , value, billionth, first, iterations, iterations - first
-        break
-    cache[lines] = iterations
+while tortoise != hare:
+    prev = tortoise
+    tortoise = spin_cycle(tortoise)
+    hare = spin_cycle(spin_cycle(hare))
     iterations += 1
-    start = perf_counter()
-    lines = spin_cycle(lines)
+print("Total", total)
+load = 0
+for i, line in enumerate(prev):
+    load += (size - i) * line.count('O')
 
-
+print(load)
