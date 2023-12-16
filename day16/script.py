@@ -16,10 +16,9 @@ def move_beam(start: tuple[int, ...]) -> int:
     while to_visit:
         beam = to_visit.pop()
         x, y, dx, dy = beam
-        adx, ady = abs(dx), abs(dy)
-        if x < 0 or y < 0 or x >= size or y >= size or (grid[y][x] == '.' and (x, y, adx, ady) in visited):
+        if x < 0 or y < 0 or x >= size or y >= size or beam in visited:
             continue
-        visited.add((x, y, adx, ady))
+        visited.add(beam)
         if grid[y][x] == '.':
             to_visit.append((x + dx, y + dy, dx, dy))
             continue
