@@ -20,7 +20,7 @@ def move_beam(start: tuple[int, ...]) -> int:
         beam = to_visit.get()
 
         x, y, dx, dy = beam
-        if beam in visited or x < 0 or y < 0 or x >= size or y >= size:
+        if x < 0 or y < 0 or x >= size or y >= size or beam in visited:
             continue
 
         visited.add(beam)
