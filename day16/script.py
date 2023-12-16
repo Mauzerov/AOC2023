@@ -33,11 +33,14 @@ def move_beam(start: tuple[int, ...]) -> int:
         x, y, dx, dy = beam
         if x < 0 or y < 0 or x >= size or y >= size or beam in visited:
             continue
-
         visited.add(beam)
         if grid[y][x] == '.':
             to_visit.append((x + dx, y + dy, dx, dy))
             continue
+        elif grid[y][x] == '/':
+            dy, dx = -dx, -dy
+        elif grid[y][x] == '\\':
+            dy, dx = dx, dy
         elif grid[y][x] in '|-':
             if grid[y][x] == '|' and dx != 0:
                 to_visit.append((x, y + 1, 0, 1))
@@ -49,10 +52,6 @@ def move_beam(start: tuple[int, ...]) -> int:
                 continue
             to_visit.append((x + dx, y + dy, dx, dy))
             continue
-        elif grid[y][x] == '/':
-            dy, dx = -dx, -dy
-        elif grid[y][x] == '\\':
-            dy, dx = dx, dy
         else:
             raise RuntimeError('Unreachable')
         to_visit.append((x + dx, y + dy, dx, dy))
