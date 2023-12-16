@@ -1,10 +1,23 @@
 import functools
 from dataclasses import dataclass
 import textwrap
+from pprint import pprint
 from time import perf_counter
 import numpy as np
 
 print(__file__)
+
+
+@functools.lru_cache(maxsize=None)
+def cached_sorted(_line) -> str: return ''.join(sorted(_line))
+
+
+@functools.lru_cache(maxsize=None)
+def cached_split(_line) -> list[str]: return _line.split('#')
+
+
+@functools.lru_cache(maxsize=None)
+def cached_reverse(_line) -> str: return ''.join(reversed(_line))
 
 
 @dataclass(slots=True)
@@ -47,52 +60,50 @@ print(calculate_total_load(lines))
 @functools.lru_cache(maxsize=None)
 def rotate(_lines: tuple[str]) -> tuple[str]:
     return tuple(
-        ''.join(reversed(_line))
+        cached_reverse(_line)
         for _line in zip(*_lines)
     )
 
 
 @functools.lru_cache(maxsize=None)
+def sort_line(_line: str) -> str:
+    return '#'.join(cached_sorted(p) for p in cached_split(_line))
+
+
+@functools.lru_cache(maxsize=None)
 def apply_gravity(_lines: tuple[str]) -> tuple[str]:
     return tuple(
-        '#'.join(''.join(sorted(p)) for p in _line.split('#'))
+        sort_line(_line)
         for _line in _lines
     )
 
 
-total = 0
-
-
 @functools.lru_cache(maxsize=None)
 def spin_cycle(_lines: tuple[str]) -> tuple[str]:
-    global total
     for _ in range(4):
-        start = perf_counter()
-        _lines = rotate(_lines)
-        total += perf_counter() - start
-        # print("Rotate", perf_counter() - start)
-        start = perf_counter()
-        _lines = apply_gravity(_lines)
-        total += perf_counter() - start
-        # print("Apply gravity", perf_counter() - start)
+        _lines = apply_gravity(rotate(_lines))
     return _lines
 
 
 cache: dict[tuple[str, ...], int] = dict()
-
-tortoise = spin_cycle(lines)
-hare = spin_cycle(spin_cycle(lines))
-prev = tortoise
-
 iterations = 0
-while tortoise != hare:
-    prev = tortoise
-    tortoise = spin_cycle(tortoise)
-    hare = spin_cycle(spin_cycle(hare))
-    iterations += 1
-print("Total", total)
-load = 0
-for i, line in enumerate(prev):
-    load += (size - i) * line.count('O')
 
-print(load)
+while True:
+    # key = ''.join(''.join(line) for line in lines)
+    if lines in cache:
+        first = cache[lines]
+        billionth = ((1_000_000_000 - first) % (iterations - first))
+
+        for key, value in cache.items():
+            if value == first + billionth:
+                load = 0
+                for i, line in enumerate(key):
+                    load += (size - i) * line.count('O')
+                print(load)  # , value, billionth, first, iterations, iterations - first
+        break
+    cache[lines] = iterations
+    iterations += 1
+    start = perf_counter()
+    lines = spin_cycle(lines)
+
+
