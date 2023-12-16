@@ -1,5 +1,3 @@
-from queue import Queue
-
 print(__file__)
 
 
@@ -11,19 +9,6 @@ with open('day16/input.txt') as f:
 global_visited = set()
 
 
-# def timed(f):
-#     from time import perf_counter
-#
-#     def wrapper(*args, **kwargs):
-#         start = perf_counter()
-#         result = f(*args, **kwargs)
-#         end = perf_counter()
-#         print(f'{f.__name__} took {end - start:.15f} seconds', result, args)
-#         return result
-#     return wrapper
-#
-#
-# @timed
 def move_beam(start: tuple[int, ...]) -> int:
     visited = set()
     to_visit = list()
@@ -31,9 +16,10 @@ def move_beam(start: tuple[int, ...]) -> int:
     while to_visit:
         beam = to_visit.pop()
         x, y, dx, dy = beam
-        if x < 0 or y < 0 or x >= size or y >= size or beam in visited:
+        adx, ady = abs(dx), abs(dy)
+        if x < 0 or y < 0 or x >= size or y >= size or (grid[y][x] == '.' and (x, y, adx, ady) in visited):
             continue
-        visited.add(beam)
+        visited.add((x, y, adx, ady))
         if grid[y][x] == '.':
             to_visit.append((x + dx, y + dy, dx, dy))
             continue
