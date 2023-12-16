@@ -1,5 +1,6 @@
 from timeit import timeit
 import termplotlib as tpl
+from statistics import median
 import re
 
 
@@ -26,8 +27,12 @@ if __name__ == '__main__':
         val_format=f"{{:.5f}}s",
     )
     fig.show()
-    sum_times = sum(map(lambda x: x[0], times))
-    average_time = sum_times / len(times)
-    print(f"Total      time: {{:.5f}} seconds".format(sum_times))
-    print(f"Average    time: {{:.5f}} seconds".format(average_time))
-    print(f"% of days < avg: {{:.2f}}%".format(sum(1 for time in times if time[0] < average_time) / len(times) * 100))
+    times = list(sorted(time[0] for time in times))
+    times_count = len(times)
+    sum_times = sum(times)
+    print(f"Total   time: {{:.5f}} seconds".format(sum_times))
+    print(f"Average time: {{:.5f}} seconds".format(sum_times / times_count))
+    print(f"Median  time: {{:.5f}} seconds".format(median(times)))
+    print(f"% of days < median: {{:.2f}}%".format(
+        sum(1 for time in times if time < median(times)) / times_count * 100)
+    )
