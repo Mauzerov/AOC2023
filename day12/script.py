@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from pprint import pprint
 import re
+from functools import lru_cache
 
 print(__file__)
 
@@ -8,7 +9,7 @@ print(__file__)
 @dataclass
 class Spring:
     condition: str
-    sizes: list[int]
+    sizes: tuple[int, ...]
 
 
 with open('day12/input.txt', 'r') as file:
@@ -17,12 +18,13 @@ with open('day12/input.txt', 'r') as file:
     springs = [
         Spring(
             condition,
-            [int(size) for size in sizes.split(',')]
+            tuple(int(size) for size in sizes.split(','))
         ) for condition, sizes in map(str.split, lines)
     ]
 
 
-def spring_combinations(condition: str, sizes: list[int], start: int = 0) -> int:
+@lru_cache(maxsize=None)
+def spring_combinations(condition: str, sizes: tuple[int, ...], start: int = 0) -> int:
     combination = 0
     if not sizes:
         return '#' not in condition[start:]
@@ -41,7 +43,7 @@ def spring_combinations(condition: str, sizes: list[int], start: int = 0) -> int
             continue
         # print(" " * start, condition[:i], '(', condition[i:i+size], ')', condition[i+size:], sep='')
 
-        combination += spring_combinations(condition, sizes, i + size + 1)
+        combination += spring_combinations(condition, tuple(sizes), i + size + 1)
     return combination
 
 
@@ -51,6 +53,11 @@ sum_of_unfolded_combinations = 0
 for spring in springs:
     comb = spring_combinations(spring.condition, spring.sizes)
     sum_of_combinations += comb
+
+    sum_of_unfolded_combinations += spring_combinations(
+        '?'.join([spring.condition] * 5),
+        spring.sizes * 5
+    )
 
 print(sum_of_combinations)
 print(sum_of_unfolded_combinations)
