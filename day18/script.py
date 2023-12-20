@@ -1,27 +1,11 @@
 import re
-from typing import NamedTuple
-from dataclasses import dataclass, field
-from collections import deque
 from PIL.Image import new
 from PIL.ImageDraw import Draw
 import colorsys
+from include import *
+
 
 print(__file__)
-
-
-@dataclass
-class Point:
-    x: int
-    y: int
-
-    def __hash__(self):
-        return hash((self.x, self.y))
-
-    def __iter__(self):
-        return iter((self.x, self.y))
-
-
-DigPlan = NamedTuple('DigPlan', [('direction', str), ('distance', str), ('color', str)])
 
 
 with open('input.txt') as f:
@@ -29,49 +13,6 @@ with open('input.txt') as f:
         DigPlan(*re.search(r'([LURD]) (\d+) \(#([a-f0-9]{6})\)', line).groups())
         for line in f.read().splitlines()
     ]
-
-DIRECTIONS = {
-    'U': Point(0, -1),
-    'D': Point(0, 1),
-    'L': Point(-1, 0),
-    'R': Point(1, 0),
-    '0': Point(1, 0),
-    '1': Point(0, 1),
-    '2': Point(-1, 0),
-    '3': Point(0, -1),
-}
-
-
-@dataclass(slots=True)
-class Node:
-    x: int
-    y: int
-    next_dir: str = None
-
-    next: 'Node' = None
-    prev: 'Node' = None
-
-    @property
-    def position(self) -> tuple[int, int]:
-        return self.x, self.y
-
-
-def left_up_most_node(node: Node) -> Node:
-    result = start = node
-    while node.next is not start:
-        node = node.next
-        if node.y < result.y or (node.y == result.y and node.x < result.x):
-            result = node
-    return result
-
-
-def linked_size(node: Node) -> int:
-    result = 0
-    start = node
-    while node.next is not start:
-        result += 1
-        node = node.next
-    return result
 
 
 def draw_map(node: Node):
@@ -134,7 +75,11 @@ def compute_area(node: Node) -> int:
     left_bottom = left_top.prev
     right_top = left_top.next
     right_bottom = right_top.next
+
+    print(nodes_between(left_top, right_top))
+
     if depth >= 11:
+        print("depth", depth)
         draw_map(node)
         input()
     if right_bottom.next is left_bottom:
