@@ -4,10 +4,9 @@ from dataclasses import dataclass, field
 from collections import deque
 from PIL.Image import new
 from PIL.ImageDraw import Draw
+import colorsys
 
 print(__file__)
-
-
 
 
 @dataclass
@@ -77,6 +76,7 @@ def linked_size(node: Node) -> int:
 
 def draw_map(node: Node):
     image = new("RGB", (1024, 1024), 0)
+    degree = 0
     canvas = Draw(image)
     offset = 300
     start = node
@@ -88,19 +88,55 @@ def draw_map(node: Node):
             (curr.y + offset) * 2,
             (next.x + offset // 2) * 2,
             (next.y + offset) * 2
-        ), width=1)
+        ), width=1, fill=tuple(map(lambda x: int(x * 255), colorsys.hls_to_rgb(degree / 360, 0.5, 1))))
+
+        canvas.ellipse((
+            (curr.x + offset // 2) * 2 - 2,
+            (curr.y + offset) * 2 - 2,
+            (curr.x + offset // 2) * 2 + 2,
+            (curr.y + offset) * 2 + 2
+        ), outline=(255, 255, 255))
+
         curr = next
+        degree += 1
+    canvas.line((
+        (curr.x + offset // 2) * 2,
+        (curr.y + offset) * 2,
+        (start.x + offset // 2) * 2,
+        (start.y + offset) * 2
+    ), width=1, fill=tuple(map(lambda x: int(x * 255), colorsys.hls_to_rgb(degree / 360, 0.5, 1))))
+
+    canvas.ellipse((
+        (curr.x + offset // 2) * 2 - 2,
+        (curr.y + offset) * 2 - 2,
+        (curr.x + offset // 2) * 2 + 2,
+        (curr.y + offset) * 2 + 2
+    ), outline=(255, 255, 255))
+    #
+    # left_top = left_up_most_node(node)
+    # left_bottom = left_top.prev
+    # right_top = left_top.next
+    # right_bottom = right_top.next
+    #
+    # canvas.rectangle((
+    #     (left_top.x + offset // 2) * 2,
+    #     (left_top.y + offset) * 2,
+    #     (right_bottom.x + offset // 2) * 2,
+    #     (right_bottom.y + offset) * 2
+    # ), outline=None, fill=(200, 200, 200))
     image.show()
 
-
+depth = 0
 def compute_area(node: Node) -> int:
+    global depth
+    depth += 1
     left_top = left_up_most_node(node)
     left_bottom = left_top.prev
     right_top = left_top.next
     right_bottom = right_top.next
-
-    draw_map(node)
-    input()
+    if depth >= 11:
+        draw_map(node)
+        input()
     if right_bottom.next is left_bottom:
         width = right_top.x - left_top.x + 1
         height = left_bottom.y - left_top.y + 1
@@ -233,9 +269,9 @@ def compute_area(node: Node) -> int:
         """
         if left_bottom.position == new_left_bottom_position \
                 and right_bottom.position == new_right_bottom_position:  # case 3
-            left_bottom.next = right_bottom.next
+            left_bottom.prev.next = right_bottom.next
             right_bottom.next.prev = left_bottom.prev
-            next_node = left_bottom.next
+            next_node = left_bottom.prev
             print("bottom: case 3")
         elif left_bottom.position == new_left_bottom_position:  # case 1
             new_right_bottom = Node(*new_right_bottom_position,
@@ -261,7 +297,7 @@ def compute_area(node: Node) -> int:
             raise RuntimeError('should not happen')
 
     assert next_node is not None
-    print("going in", total_area)
+    print("going in", total_area, "depth", depth)
     additional_area = compute_area(next_node)
     print("going out: ", additional_area)
     return total_area + additional_area
