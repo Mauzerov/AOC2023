@@ -2,8 +2,12 @@ import re
 from typing import NamedTuple
 from dataclasses import dataclass, field
 from collections import deque
+from PIL.Image import new
+from PIL.ImageDraw import Draw
 
 print(__file__)
+
+
 
 
 @dataclass
@@ -20,7 +24,8 @@ class Point:
 
 DigPlan = NamedTuple('DigPlan', [('direction', str), ('distance', str), ('color', str)])
 
-with open('day18/input.txt') as f:
+
+with open('input.txt') as f:
     plans: list[DigPlan] = [
         DigPlan(*re.search(r'([LURD]) (\d+) \(#([a-f0-9]{6})\)', line).groups())
         for line in f.read().splitlines()
@@ -70,12 +75,32 @@ def linked_size(node: Node) -> int:
     return result
 
 
+def draw_map(node: Node):
+    image = new("RGB", (1024, 1024), 0)
+    canvas = Draw(image)
+    offset = 300
+    start = node
+    curr = node
+    while start != curr.next:
+        next = curr.next
+        canvas.line((
+            (curr.x + offset // 2) * 2,
+            (curr.y + offset) * 2,
+            (next.x + offset // 2) * 2,
+            (next.y + offset) * 2
+        ), width=1)
+        curr = next
+    image.show()
+
+
 def compute_area(node: Node) -> int:
     left_top = left_up_most_node(node)
     left_bottom = left_top.prev
     right_top = left_top.next
     right_bottom = right_top.next
 
+    draw_map(node)
+    input()
     if right_bottom.next is left_bottom:
         width = right_top.x - left_top.x + 1
         height = left_bottom.y - left_top.y + 1
