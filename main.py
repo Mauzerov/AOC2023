@@ -17,3 +17,4 @@ import day16.script
 import day17.script
 import day18.script
 import day19.script
+import day20.script
