@@ -1,6 +1,8 @@
 import re
 from dataclasses import dataclass, asdict, astuple
 from functools import lru_cache
+from itertools import product
+from pprint import pprint
 
 print(__file__)
 
@@ -20,7 +22,7 @@ class System:
     not_found: str
 
 
-with open('input.txt') as f:
+with open('day19/input.txt') as f:
     systems_input, parts_input = f.read().split("\n\n")
 
     systems = {}
@@ -38,14 +40,6 @@ with open('input.txt') as f:
     parts = [
         Part(**eval(re.sub(r'([xmas])=', r'"\1":', part))) for part in parts_input.splitlines()
     ]
-
-
-combination = {
-    "x": (1, 4000),
-    "m": (1, 4000),
-    "a": (1, 4000),
-    "s": (1, 4000),
-}
 
 
 @lru_cache(maxsize=None)
@@ -74,9 +68,93 @@ for part in parts:
 
 print(accepted_sum)
 
-combinations = 1
 
-for key, value in combination.items():
-    combinations *= value[1] - value[0] + 1
+def calculate_combinations(false_: list[str], true_: list[str]):
+    bounds = {
+        'x': set(),
+        'm': set(),
+        'a': set(),
+        's': set(),
+    }
+    false_conditions, true_conditions = false_, true_
 
-print(combinations)
+    for false_condition in false_conditions:
+        key, op, value = re.search(r'([xmas])([<>])(\d+)', false_condition).groups()
+        value = int(value)
+
+        if op == '<':
+            bounds[key].add(range(value, 4000))
+        elif op == '>':
+            bounds[key].add(range(1, value))
+
+    for true_condition in true_conditions:
+        key, op, value = re.search(r'([xmas])([<>])(\d+)', true_condition).groups()
+        value = int(value)
+
+        if op == '<':
+            bounds[key].add(range(1, value - 1))
+        elif op == '>':
+            bounds[key].add(range(value + 1, 4000))
+
+    distinct_bounds = {
+        key: set(range(1, 4001)) for key in bounds.keys()
+    }
+
+    for key, value in bounds.items():
+        for range_ in value:
+            distinct_bounds[key] &= (set(range_) | {range_.stop})
+
+    product_ = 1
+    for key, value in distinct_bounds.items():
+        product_ *= len(value)
+    return product_
+
+
+def calculate_bounds(system: System, false_conditions: list[str], true_conditions: list[str]):
+    _possibilities = 0
+    current_conditions = []
+    for condition, destination in system.conditions:
+        current_conditions.append(condition)
+        if destination.islower():
+            _possibilities += calculate_bounds(
+                systems[destination],
+                list(false_conditions + current_conditions[:-1]),
+                list(true_conditions + [condition])
+            )
+            continue
+        if destination == 'R':
+            continue
+        ## Acceptable Condition
+
+        _possibilities += calculate_combinations(
+            false_conditions + current_conditions[:-1],
+            true_conditions + [condition]
+        )
+
+    ## Else Condition
+    if system.not_found.islower():
+        _possibilities += calculate_bounds(
+            systems[system.not_found],
+            list(false_conditions + current_conditions),
+            true_conditions.copy()
+        )
+    elif system.not_found == 'R':
+        pass
+    else:  # Acceptable Condition
+        _possibilities += calculate_combinations(
+            false_conditions + current_conditions,
+            true_conditions.copy()
+        )
+
+    return _possibilities
+
+
+possibilities = calculate_bounds(systems["in"], [], [])
+
+print(possibilities)
+#
+# combinations = 1
+# for key, (min_, max_) in bounds.items():
+#     combinations *= max_ - min_ + 1
+#
+# print(combinations)
