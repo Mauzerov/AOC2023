@@ -1,5 +1,6 @@
 import re
 from abc import ABC
+from math import lcm
 from typing import Generator
 from collections import deque
 
@@ -80,9 +81,17 @@ with open('input.txt') as f:
                 if isinstance(destination_module, Conjunction):
                     destination_module.previous_pulses[module.name] = 'low'
 
-prev = 0
+final_conjunction = next(module for module in modules.values() if 'rx' in module.destinations)
+output_receivers = {
+    module.name: 0
+    for module in modules.values()
+    if final_conjunction.name in module.destinations
+}
 
-for i in range(1000):
+button_presses = 0
+
+while not all(output_receivers.values()) or button_presses < 1000:
+    button_presses += 1
     stack: deque[callable] = deque()
     pulses['low'] += 1
     for destination in start_destinations:
@@ -93,32 +102,15 @@ for i in range(1000):
     while stack:
         sender, receiver, pulse_ = stack.popleft()
         pulses[pulse_] += 1
+        module = modules.get(receiver)
 
-        try:
-            for current in modules[receiver].receive(pulse_, sender):
-                stack.append(current)
-        except KeyError:
-            pass
-
-    flipflops_on = [not m.on for m in modules.values() if isinstance(m, FlipFlop)]
-
-    if all(flipflops_on):
-        print(i, prev - i)
-        prev = i
+        if pulse_ == 'high' and sender in output_receivers and output_receivers[sender] == 0:
+            output_receivers[sender] = button_presses
+        if module is None:
+            continue
+        for current in module.receive(pulse_, sender):
+            stack.append(current)
 
 print(pulses['low'] * pulses['high'])
-
-
-with open('graph.dot', 'w') as graph:
-    graph.write("digraph {\n")
-    for module in modules.values():
-        color = 'red' if isinstance(module, FlipFlop) else 'blue'
-        graph.write(f"\t{module.name} [color={color}]\n")
-        for connection in module.destinations:
-            graph.write(f"\t{module.name} -> {connection}\n")
-
-    for start in start_destinations:
-        graph.write(f"\tbroadcaster -> {start}\n")
-    graph.write("}\n")
-
+print(lcm(*output_receivers.values()))
 
