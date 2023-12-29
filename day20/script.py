@@ -91,7 +91,10 @@ output_receivers = {
 button_presses = 0
 
 while not all(output_receivers.values()) or button_presses < 1000:
+    if button_presses == 1000:
+        print(pulses['low'] * pulses['high'])
     button_presses += 1
+
     stack: deque[callable] = deque()
     pulses['low'] += 1
     for destination in start_destinations:
@@ -111,6 +114,6 @@ while not all(output_receivers.values()) or button_presses < 1000:
         for current in module.receive(pulse_, sender):
             stack.append(current)
 
-print(pulses['low'] * pulses['high'])
+
 print(lcm(*output_receivers.values()))
 
