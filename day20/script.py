@@ -60,7 +60,7 @@ class Conjunction(Module):
 
 start_destinations = None
 
-with open('input.txt') as f:
+with open('day20/input.txt') as f:
     for line in f.read().splitlines():
         if line.startswith('broadcaster'):
             destinations, = re.search(r'broadcaster -> ((?:[a-z]+(?:, )?)+)', line).groups()
